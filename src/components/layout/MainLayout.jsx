@@ -25,10 +25,10 @@ const MainLayout = ({ children }) => {
   }, [theme, i18n.language]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+    <div className="flex flex-col grow bg-background text-foreground transition-colors duration-300">
       <Navbar />
       <main
-        className={`container mx-auto px-4 pb-8 transition-all duration-300 ${
+        className={`grow container mx-auto px-4 pb-8 transition-all duration-300 ${
           isAuthPage ? "pt-24" : "pt-44 md:pt-36 lg:pt-32"
         }`}
       >

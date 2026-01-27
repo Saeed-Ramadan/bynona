@@ -25,6 +25,7 @@ i18n
           logout: "تسجيل الخروج",
           dark_mode: "الوضع الداكن",
           light_mode: "الوضع الفاتح",
+          all_categories: "جميع الأقسام",
           // for footer
           footer_subscribe_title: "كن أول من يعرف عروضنا الحصرية!",
           footer_subscribe_sub:
@@ -75,6 +76,7 @@ i18n
           logout: "Logout",
           dark_mode: "Dark Mode",
           light_mode: "Light Mode",
+          all_categories: "All Categories",
           // for footer
           footer_subscribe_title: "Be the first to know our exclusive offers!",
           footer_subscribe_sub:

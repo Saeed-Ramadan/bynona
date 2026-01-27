@@ -12,6 +12,10 @@ import {
   Moon,
   Languages,
   Settings,
+  Menu,
+  Grid,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useThemeStore } from "../store/useThemeStore";
 
@@ -19,6 +23,7 @@ import { Link, useLocation } from "react-router-dom";
 import mainLogo from "../assets/logo/logo.png";
 import Button from "./ui/Button";
 import { logoutUser } from "../lib/axios";
+import axiosInstance from "../lib/axios";
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
@@ -26,7 +31,20 @@ const Navbar = () => {
   const isAuthPage = ["/login", "/register"].includes(location.pathname);
   const { theme, toggleTheme } = useThemeStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const categoriesRef = useRef(null);
+  const scrollRef = useRef(null);
+
+  const handleScroll = (direction) => {
+    if (scrollRef.current) {
+      const scrollAmount = 200;
+      scrollRef.current.scrollBy({
+        left: direction === "right" ? scrollAmount : -scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
 
   const [user, setUser] = useState(() => {
     try {
@@ -43,6 +61,12 @@ const Navbar = () => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
+      }
+      if (
+        categoriesRef.current &&
+        !categoriesRef.current.contains(event.target)
+      ) {
+        setIsCategoriesOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -83,19 +107,24 @@ const Navbar = () => {
     i18n.changeLanguage(newLang);
   };
 
-  const categories = [
-    { key: "mobiles", path: "/category/mobiles" },
-    { key: "accessories", path: "/category/accessories" },
-    { key: "smart_watch", path: "/category/smart-watches" },
-    { key: "electronics", path: "/category/electronics" },
-    { key: "audio", path: "/category/audio" },
-    { key: "cameras", path: "/category/cameras" },
-    { key: "household", path: "/category/household" },
-    { key: "appliances", path: "/category/appliances" },
-  ];
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axiosInstance.get("/categories");
+        if (response.data.success) {
+          setCategories(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, [i18n.language]);
 
   return (
-    <nav className="fixed top-0 left-0 w-full shadow-sm bg-background/95 backdrop-blur-md border-b border-border z-50 transition-colors duration-300">
+    <nav className="fixed top-0 left-0 w-full shadow-sm bg-background border-b border-border z-50 transition-colors duration-300">
       {/* Main Header */}
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
         {/* Logo */}
@@ -179,7 +208,7 @@ const Navbar = () => {
 
             {/* Dropdown Menu */}
             {isDropdownOpen && (
-              <div className="absolute top-full mt-2 right-0 rtl:left-0 rtl:right-auto w-56 bg-popover text-popover-foreground border border-border rounded-xl shadow-2xl z-[1000] py-2 animate-in fade-in slide-in-from-top-2 duration-200 backdrop-blur-sm">
+              <div className="absolute top-full mt-2 right-0 rtl:left-0 rtl:right-auto w-56 bg-background text-foreground border border-border rounded-xl shadow-2xl z-[1000] py-2 animate-in fade-in slide-in-from-top-2 duration-200">
                 {/* Profile Link */}
                 {user && (
                   <>
@@ -284,7 +313,7 @@ const Navbar = () => {
               className="w-full border border-input rounded-lg py-2 px-4 bg-secondary/50 focus:bg-background outline-none focus:ring-2 focus:ring-primary transition-all pr-12 rtl:pl-12 rtl:pr-4 text-sm"
             />
             <div
-              className={`absolute ${i18n.language === "ar" ? "left-0" : "right-0"} top-0 bottom-0 flex items-center justify-center px-1`}
+              className={`absolute ${i18n.language === "ar" ? "left-0" : "right-0"} top-0 bottom-0 flex items-center justify-center `}
             >
               <Button
                 size="icon"
@@ -300,20 +329,98 @@ const Navbar = () => {
 
       {/* Categories Bar */}
       {!isAuthPage && (
-        <div className="bg-primary/95 backdrop-blur-sm dark:bg-primary/90 shadow-inner">
-          <div className="max-w-7xl mx-auto px-4 overflow-x-auto no-scrollbar scroll-smooth">
-            <ul className="flex items-center gap-6 lg:gap-10 py-2.5 text-xs lg:text-sm font-bold text-primary-foreground whitespace-nowrap min-w-max mx-auto md:justify-center">
-              {categories.map((cat) => (
-                <li key={cat.key}>
-                  <Link
-                    to={cat.path}
-                    className="hover:opacity-70 transition-opacity uppercase tracking-tight inline-block"
-                  >
-                    {t(cat.key)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+        <div className="bg-primary shadow-lg border-t border-white/10 relative">
+          <div className="max-w-7xl mx-auto px-4">
+            {/* Mobile Dropdown View */}
+            <div className="md:hidden py-3" ref={categoriesRef}>
+              <button
+                onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
+                className="w-full flex items-center justify-between px-4 py-2.5 bg-white/10 rounded-lg text-primary-foreground font-bold transition-all hover:bg-white/20 active:scale-[0.98]"
+              >
+                <div className="flex items-center gap-3">
+                  <Grid className="w-5 h-5" />
+                  <span>{t("all_categories")}</span>
+                </div>
+                <ChevronDown
+                  className={`w-5 h-5 transition-transform duration-300 ${isCategoriesOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {/* Mobile Categories Menu */}
+              {isCategoriesOpen && (
+                <div className="absolute left-4 right-4 top-full mt-2 bg-background border border-border rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="grid grid-cols-1 divide-y divide-border max-h-[60vh] overflow-y-auto no-scrollbar">
+                    {categories.map((cat) => (
+                      <Link
+                        key={cat.id}
+                        to={`/category/${cat.id}`}
+                        onClick={() => setIsCategoriesOpen(false)}
+                        className="flex items-center gap-4 px-5 py-4 hover:bg-secondary transition-colors group"
+                      >
+                        {cat.image_path ? (
+                          <img
+                            src={cat.image_path}
+                            alt=""
+                            className="w-10 h-10 object-contain rounded-lg bg-secondary group-hover:scale-110 transition-transform"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
+                            <Grid className="w-5 h-5 text-muted-foreground" />
+                          </div>
+                        )}
+                        <span className="font-bold text-foreground">
+                          {cat.name}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Horizontal View */}
+            <div className="hidden md:flex items-center relative group/scroll">
+              <button
+                onClick={() => handleScroll("left")}
+                className="absolute left-0 z-10 p-1 bg-primary text-primary-foreground rounded-full shadow-md hover:scale-110 transition-transform opacity-0 group-hover/scroll:opacity-100 -translate-x-1/2"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              <div
+                ref={scrollRef}
+                className="grow overflow-x-auto no-scrollbar scroll-smooth"
+              >
+                <ul className="flex items-center justify-start md:justify-center gap-6 lg:gap-10 py-2.5 text-xs lg:text-sm font-bold text-primary-foreground min-w-max mx-auto px-10">
+                  {categories.map((cat) => (
+                    <li key={cat.id} className="shrink-0">
+                      <Link
+                        to={`/category/${cat.id}`}
+                        className="flex items-center gap-2 hover:opacity-80 transition-all group"
+                      >
+                        {cat.image_path && (
+                          <img
+                            src={cat.image_path}
+                            alt=""
+                            className="w-4 h-4 lg:w-5 lg:h-5 object-contain rounded-full bg-white/20 p-0.5 group-hover:scale-110 transition-transform"
+                          />
+                        )}
+                        <span className="tracking-tight whitespace-nowrap">
+                          {cat.name}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <button
+                onClick={() => handleScroll("right")}
+                className="absolute right-0 z-10 p-1 bg-primary text-primary-foreground rounded-full shadow-md hover:scale-110 transition-transform opacity-0 group-hover/scroll:opacity-100 translate-x-1/2"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       )}
