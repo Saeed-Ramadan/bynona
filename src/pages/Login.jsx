@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { getLoginSchema } from "../utils/validation";
+import logo from "../assets/logo/logo.png";
 function Login() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -63,7 +64,18 @@ function Login() {
     <div className="flex items-center justify-center py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold">{t("login")}</CardTitle>
+          <div className="flex justify-center mb-4">
+            <div className="border border-background dark:border-foreground rounded-md p-1">
+              <img
+                src={logo}
+                alt="Bynona Logo"
+                className="h-10 object-contain dark:invert"
+              />
+            </div>
+          </div>
+          <CardTitle className="text-3xl font-extrabold text-[#FAD52E]">
+            {t("login")}
+          </CardTitle>
           <p className="text-muted-foreground mt-2">
             {t("welcome_back", "Welcome back to Bynona")}
           </p>

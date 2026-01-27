@@ -22,6 +22,9 @@ i18n
           cameras: "منتجات التصوير",
           household: "الأدوات المنزلية",
           appliances: "الأجهزة الكهربائية",
+          logout: "تسجيل الخروج",
+          dark_mode: "الوضع الداكن",
+          light_mode: "الوضع الفاتح",
           // for footer
           footer_subscribe_title: "كن أول من يعرف عروضنا الحصرية!",
           footer_subscribe_sub:
@@ -32,6 +35,9 @@ i18n
           quick_links: "روابط سريعة",
           contact_us: "تواصل معنا",
           follow_us: "تابعنا",
+          footer_all_rights: "جميع الحقوق محفوظة لموقعنا",
+          designed_by: "صُمم ونُفذ بواسطة",
+          download_app: "حمّل تطبيقنا الآن",
           // for login page
           welcome_back: "مرحباً بعودتك إلى Bynona",
           email: "البريد الإلكتروني",
@@ -66,6 +72,9 @@ i18n
           cameras: "Cameras",
           household: "Household",
           appliances: "Electric Appliances",
+          logout: "Logout",
+          dark_mode: "Dark Mode",
+          light_mode: "Light Mode",
           // for footer
           footer_subscribe_title: "Be the first to know our exclusive offers!",
           footer_subscribe_sub:
@@ -76,6 +85,9 @@ i18n
           quick_links: "Quick Links",
           contact_us: "Contact Us",
           follow_us: "Follow Us",
+          footer_all_rights: "All rights reserved for our site",
+          designed_by: "Designed and Developed by",
+          download_app: "Download our app now",
           // for login page
           welcome_back: "Welcome back to Bynona",
           email: "Email Address",

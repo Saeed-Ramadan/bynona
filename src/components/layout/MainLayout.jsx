@@ -3,10 +3,13 @@ import Navbar from "../Navbar";
 import Footer from "../Footer";
 import { useThemeStore } from "../../store/useThemeStore";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 
 const MainLayout = ({ children }) => {
   const { theme } = useThemeStore();
   const { i18n } = useTranslation();
+  const location = useLocation();
+  const isAuthPage = ["/login", "/register"].includes(location.pathname);
 
   useEffect(() => {
     // Update theme class on document element
@@ -24,7 +27,13 @@ const MainLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <Navbar />
-      <main className="container mx-auto px-4 pt-32 pb-8">{children}</main>
+      <main
+        className={`container mx-auto px-4 pb-8 transition-all duration-300 ${
+          isAuthPage ? "pt-24" : "pt-44 md:pt-36 lg:pt-32"
+        }`}
+      >
+        {children}
+      </main>
       <Footer />
     </div>
   );

@@ -89,11 +89,17 @@ export const loginUser = async (email, password) => {
   }
 };
 
-export const logoutUser = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("refresh_token");
-  localStorage.removeItem("user");
-  window.location.href = "/login";
+export const logoutUser = async () => {
+  try {
+    await axiosInstance.post("/logout");
+  } catch (error) {
+    console.error("Logout API failed", error);
+  } finally {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+  }
 };
 
 export default axiosInstance;

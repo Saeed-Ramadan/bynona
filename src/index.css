@@ -30,6 +30,7 @@
   --border: #e4e4e7;
   --input: #e4e4e7;
   --ring: #FAD52E;
+  --footer-bg: #FEF9E7;
 }
 
 .dark {
@@ -52,6 +53,7 @@
   --border: #27272a;
   --input: #27272a;
   --ring: #FAD52E;
+  --footer-bg: #020617;
 }
 
 @layer base {
