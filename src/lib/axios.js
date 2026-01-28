@@ -1,6 +1,6 @@
 import axios from "axios";
 import i18n from "../i18n";
-import { toast } from "sonner";
+import { toast } from "./toast";
 
 const API_URL = "https://bynona.store/api/v1";
 
@@ -15,7 +15,14 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
+    const { priceMode } = JSON.parse(
+      localStorage.getItem("price-mode-storage") ||
+        '{"state":{"priceMode":"retail"}}',
+    ).state;
+
     config.headers["Accept-Language"] = i18n.language || "ar";
+    config.headers["Price-Mode"] = priceMode || "retail";
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -99,6 +106,120 @@ export const logoutUser = async () => {
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
     window.location.href = "/login";
+  }
+};
+
+export const registerUser = async (data) => {
+  try {
+    const response = await axiosInstance.post("/register", data);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      const message = error.response.data.message || "Something went wrong";
+      toast.error(message);
+      throw new Error(message);
+    } else {
+      toast.error("Network error");
+      throw new Error("Network error");
+    }
+  }
+};
+
+export const verifyOtp = async (email, otp) => {
+  try {
+    const response = await axiosInstance.post("/verify-otp", { email, otp });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      const message = error.response.data.message || "Invalid OTP";
+      toast.error(message);
+      throw new Error(message);
+    } else {
+      toast.error("Network error");
+      throw new Error("Network error");
+    }
+  }
+};
+
+export const resendOtp = async (email) => {
+  try {
+    const response = await axiosInstance.post("/resend-otp", { email });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      const message = error.response.data.message || "Failed to resend OTP";
+      toast.error(message);
+      throw new Error(message);
+    } else {
+      toast.error("Network error");
+      throw new Error("Network error");
+    }
+  }
+};
+
+export const sendResetEmail = async (email) => {
+  try {
+    const response = await axiosInstance.post("/sendEmail", { email });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      const message = error.response.data.message || "Failed to send email";
+      toast.error(message);
+      throw new Error(message);
+    } else {
+      toast.error("Network error");
+      throw new Error("Network error");
+    }
+  }
+};
+
+export const verifyResetOtp = async (email, otp) => {
+  try {
+    const response = await axiosInstance.post("/sendCode", { email, otp });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      const message = error.response.data.message || "Invalid Code";
+      toast.error(message);
+      throw new Error(message);
+    } else {
+      toast.error("Network error");
+      throw new Error("Network error");
+    }
+  }
+};
+
+export const resetPassword = async (data) => {
+  try {
+    const response = await axiosInstance.post("/password", data);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      const message = error.response.data.message || "Failed to reset password";
+      toast.error(message);
+      throw new Error(message);
+    } else {
+      toast.error("Network error");
+      throw new Error("Network error");
+    }
+  }
+};
+
+export const resendResetOtp = async (email) => {
+  try {
+    const response = await axiosInstance.post("/forgotPassword/resend-otp", {
+      email,
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      const message = error.response.data.message || "Failed to resend code";
+      toast.error(message);
+      throw new Error(message);
+    } else {
+      toast.error("Network error");
+      throw new Error("Network error");
+    }
   }
 };
 

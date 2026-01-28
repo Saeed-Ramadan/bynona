@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Mail,
@@ -7,51 +8,83 @@ import {
   Instagram,
   Twitter,
   Youtube,
-  Search,
 } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import footerLogo from "../assets/logo/logo.png";
 import Button from "./ui/Button";
+import axiosInstance from "../lib/axios";
 
 const Footer = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
-  const isAuthPage = ["/login", "/register"].includes(location.pathname);
+  const isAuthPage = [
+    "/login",
+    "/register",
+    "/verify-otp",
+    "/forgot-password",
+    "/verify-reset-otp",
+    "/reset-password",
+  ].includes(location.pathname);
 
-  const footerLinks = [
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [categoriesRes, brandsRes] = await Promise.all([
+          axiosInstance.get("/categories"),
+          axiosInstance.get("/brands"),
+        ]);
+
+        if (categoriesRes.data.success) {
+          setCategories(categoriesRes.data.data);
+        }
+        if (brandsRes.data.status) {
+          setBrands(brandsRes.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching footer data:", error);
+      }
+    };
+
+    if (!isAuthPage) {
+      fetchData();
+    }
+  }, [isAuthPage, i18n.language]);
+
+  const quickLinks = [
+    { name: t("home", "الرئيسية"), path: "/" },
+    { name: t("offers", "العروض"), path: "/offers" },
+    { name: t("new_arrivals", "وصل حديثاً / جديدنا"), path: "/new-arrivals" },
+    { name: t("best_sellers", "الأكثر مبيعاً"), path: "/best-sellers" },
+    { name: t("why_us", "لماذا نحن"), path: "/about" },
+  ];
+
+  const categoriesLinks = categories.map((cat) => ({
+    name: cat.name,
+    path: `/category/${cat.id}`,
+  }));
+
+  const brandsLinks = brands.map((brand) => ({
+    name: brand.name,
+    path: `/brand/${brand.id}`,
+  }));
+
+  const footerLinkGroups = [
     {
       title: t("quick_links"),
-      links: [
-        "الرئيسية",
-        "العروض",
-        "وصل حديثاً / جديدنا",
-        "الأكثر مبيعاً",
-        "لماذا نحن",
-      ],
+      links: quickLinks,
     },
     {
-      title: "الأقسام",
-      links: [
-        "الهواتف المحمولة",
-        "الشواحن والإكسسوارات",
-        "الصوتيات والسماعات",
-        "أجهزة الكمبيوتر واللابتوب",
-        "أجهزة التابلت",
-      ],
+      title: t("categories_title", "الأقسام"),
+      links: categoriesLinks,
+      split: categoriesLinks.length > 6,
     },
     {
-      title: "المطبخ والأجهزة المنزلية",
-      links: [
-        "الثلاجات والفريزر",
-        "الغسالات والمجففات",
-        "الأفران والميكروويف",
-        "الأجهزة الصغيرة (خلاطات، مكواة...)",
-        "أجهزة المطبخ الذكية",
-      ],
-    },
-    {
-      title: "افضل الماركات",
-      links: ["سامسونج", "إل جي", "شاومي", "فيليبس", "باناسونيك", "كينوود"],
+      title: t("best_brands", "افضل الماركات"),
+      links: brandsLinks,
+      split: brandsLinks.length > 6,
     },
   ];
 
@@ -60,7 +93,7 @@ const Footer = () => {
       <div className="py-12 px-4 text-foreground">
         {/* Links Section - Hidden on Auth Pages */}
         {!isAuthPage && (
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
             <div className="flex flex-col gap-6">
               <div>
                 <h3 className="font-bold text-lg mb-4">{t("contact_us")}</h3>
@@ -97,21 +130,46 @@ const Footer = () => {
               </div>
             </div>
 
-            {footerLinks.map((group, idx) => (
+            {footerLinkGroups.map((group, idx) => (
               <div key={idx}>
                 <h3 className="font-bold text-lg mb-6">{group.title}</h3>
-                <ul className="space-y-3">
-                  {group.links.map((link, lIdx) => (
-                    <li key={lIdx}>
-                      <a
-                        href="#"
-                        className="text-muted-foreground hover:text-primary transition-colors text-sm"
-                      >
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+                <div className={group.split ? "grid grid-cols-2 gap-x-4" : ""}>
+                  <ul className="space-y-3">
+                    {group.links
+                      .slice(
+                        0,
+                        group.split
+                          ? Math.ceil(group.links.length / 2)
+                          : group.links.length,
+                      )
+                      .map((link, lIdx) => (
+                        <li key={lIdx}>
+                          <Link
+                            to={link.path}
+                            className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                          >
+                            {link.name}
+                          </Link>
+                        </li>
+                      ))}
+                  </ul>
+                  {group.split && (
+                    <ul className="space-y-3">
+                      {group.links
+                        .slice(Math.ceil(group.links.length / 2))
+                        .map((link, lIdx) => (
+                          <li key={lIdx}>
+                            <Link
+                              to={link.path}
+                              className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                            >
+                              {link.name}
+                            </Link>
+                          </li>
+                        ))}
+                    </ul>
+                  )}
+                </div>
               </div>
             ))}
           </div>

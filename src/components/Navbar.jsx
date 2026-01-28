@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Search,
+  Search as SearchIcon,
   ShoppingCart,
   Heart,
   User,
@@ -18,17 +18,27 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useThemeStore } from "../store/useThemeStore";
+import { usePriceModeStore } from "../store/usePriceModeStore";
 
 import { Link, useLocation } from "react-router-dom";
 import mainLogo from "../assets/logo/logo.png";
 import Button from "./ui/Button";
 import { logoutUser } from "../lib/axios";
 import axiosInstance from "../lib/axios";
+import PriceModeToggle from "./ui/PriceModeToggle";
+import Search from "./ui/Search";
 
 const Navbar = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
-  const isAuthPage = ["/login", "/register"].includes(location.pathname);
+  const isAuthPage = [
+    "/login",
+    "/register",
+    "/verify-otp",
+    "/forgot-password",
+    "/verify-reset-otp",
+    "/reset-password",
+  ].includes(location.pathname);
   const { theme, toggleTheme } = useThemeStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
@@ -78,16 +88,12 @@ const Navbar = () => {
     const storedUser = localStorage.getItem("user");
     const parsedUser = storedUser ? JSON.parse(storedUser) : null;
 
-    setUser((prev) => {
-      const prevStr = JSON.stringify(prev);
-      const nextStr = JSON.stringify(parsedUser);
-      return prevStr !== nextStr ? parsedUser : prev;
-    });
+    // Compare stringified versions to avoid unnecessary updates/infinite loops
+    if (JSON.stringify(user) !== JSON.stringify(parsedUser)) {
+      setUser(parsedUser);
+    }
 
-    // Use a small delay for closing dropdown to avoid layout shift/state conflicts if needed,
-    // though here we just want to avoid the lint trigger.
-    const timer = setTimeout(() => setIsDropdownOpen(false), 0);
-    return () => clearTimeout(timer);
+    setIsDropdownOpen(false);
   }, [location.pathname]);
 
   // Sync document direction and language
@@ -109,6 +115,8 @@ const Navbar = () => {
 
   const [categories, setCategories] = useState([]);
 
+  const { priceMode } = usePriceModeStore();
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -121,7 +129,7 @@ const Navbar = () => {
       }
     };
     fetchCategories();
-  }, [i18n.language]);
+  }, [i18n.language, priceMode]);
 
   return (
     <nav className="fixed top-0 left-0 w-full shadow-sm bg-background border-b border-border z-50 transition-colors duration-300">
@@ -137,26 +145,7 @@ const Navbar = () => {
         </Link>
 
         {/* Search Bar */}
-        {!isAuthPage && (
-          <div className="hidden md:flex grow max-w-xl relative group">
-            <input
-              type="text"
-              placeholder={t("search_placeholder")}
-              className="w-full border border-input rounded-lg py-2 px-4 bg-secondary/50 focus:bg-background outline-none focus:ring-2 focus:ring-primary transition-all pr-12 rtl:pl-12 rtl:pr-4"
-            />
-            <div
-              className={`absolute ${i18n.language === "ar" ? "left-0" : "right-0"} top-0 bottom-0 flex items-center justify-center`}
-            >
-              <Button
-                size="icon"
-                variant="primary"
-                className="h-8 w-8 shadow-none hover:shadow-md transition-shadow"
-              >
-                <Search className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        )}
+        {!isAuthPage && <Search className="hidden md:block grow max-w-xl" />}
 
         <div className="flex items-center gap-1 sm:gap-2">
           {/* Location Info (Desktop) */}
@@ -171,7 +160,13 @@ const Navbar = () => {
           )}
 
           {!isAuthPage && (
-            <div className="h-6 w-px bg-border mx-1 hidden lg:block" />
+            <div className="hidden lg:block h-6 w-px bg-border mx-1" />
+          )}
+
+          {!isAuthPage && (
+            <div className="hidden sm:block">
+              <PriceModeToggle />
+            </div>
           )}
 
           {/* Settings & User Dropdown */}
@@ -251,6 +246,10 @@ const Navbar = () => {
                   <span>{i18n.language === "ar" ? "English" : "العربية"}</span>
                 </button>
 
+                <div className="px-4 py-2 sm:hidden">
+                  <PriceModeToggle />
+                </div>
+
                 <div className="my-1 border-t border-border" />
 
                 {/* Auth Related Item */}
@@ -306,24 +305,7 @@ const Navbar = () => {
       {/* Mobile Search Row (visible on < md) */}
       {!isAuthPage && (
         <div className="md:hidden px-4 pb-3">
-          <div className="relative group">
-            <input
-              type="text"
-              placeholder={t("search_placeholder")}
-              className="w-full border border-input rounded-lg py-2 px-4 bg-secondary/50 focus:bg-background outline-none focus:ring-2 focus:ring-primary transition-all pr-12 rtl:pl-12 rtl:pr-4 text-sm"
-            />
-            <div
-              className={`absolute ${i18n.language === "ar" ? "left-0" : "right-0"} top-0 bottom-0 flex items-center justify-center `}
-            >
-              <Button
-                size="icon"
-                variant="primary"
-                className="h-8 w-8 shadow-none"
-              >
-                <Search className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
+          <Search />
         </div>
       )}
 

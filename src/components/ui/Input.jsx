@@ -3,7 +3,15 @@ import { AlertCircle, Eye, EyeOff } from "lucide-react";
 
 const Input = React.forwardRef(
   (
-    { label, error, className = "", containerClassName = "", type, ...props },
+    {
+      label,
+      error,
+      className = "",
+      containerClassName = "",
+      type,
+      icon: Icon,
+      ...props
+    },
     ref,
   ) => {
     const [showPassword, setShowPassword] = useState(false);
@@ -15,15 +23,23 @@ const Input = React.forwardRef(
           <label className="text-sm font-medium text-foreground">{label}</label>
         )}
         <div className="relative">
+          {Icon && (
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground rtl:left-auto rtl:right-0 rtl:pr-3">
+              <Icon size={18} />
+            </div>
+          )}
           <input
             ref={ref}
             type={isPassword && showPassword ? "text" : type}
-            className={`flex h-10 w-full rounded-lg border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200
+            className={`flex h-11 w-full rounded-lg border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200
               ${
                 error
                   ? "border-red-500 focus-visible:ring-red-500/20 text-red-900 placeholder:text-red-300 dark:text-red-100"
-                  : "border-input focus-visible:ring-ring"
-              } ${className} ${isPassword ? "pr-10 rtl:pl-10 rtl:pr-3" : ""} ${error && !isPassword ? "pr-10 rtl:pl-10 rtl:pr-3" : ""}`}
+                  : "border-input focus-visible:ring-ring focus:border-primary"
+              } ${className}
+              ${Icon ? "pl-10 rtl:pr-10 rtl:pl-3" : ""}
+              ${isPassword ? "pr-10 rtl:pl-10 rtl:pr-3" : ""}
+              ${error && !isPassword ? "pr-10 rtl:pl-10 rtl:pr-3" : ""}`}
             {...props}
           />
 
@@ -42,14 +58,10 @@ const Input = React.forwardRef(
             </button>
           )}
 
-          {error && !isPassword && (
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none rtl:right-auto rtl:left-0 rtl:pl-3 rtl:pr-0">
-              <AlertCircle className="h-4 w-4 text-red-500" />
-            </div>
-          )}
-
-          {error && isPassword && (
-            <div className="absolute inset-y-0 right-0 pr-1 flex items-center pointer-events-none rtl:right-auto rtl:left-0 rtl:pl-1 rtl:pr-0">
+          {error && (
+            <div
+              className={`absolute inset-y-0 ${isPassword ? "right-8 rtl:left-8 rtl:right-auto" : "right-3 rtl:left-3 rtl:right-auto"} flex items-center pointer-events-none`}
+            >
               <AlertCircle className="h-4 w-4 text-red-500" />
             </div>
           )}
