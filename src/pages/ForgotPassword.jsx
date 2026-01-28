@@ -15,6 +15,7 @@ import { toast } from "../lib/toast";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { staggerContainer, staggerItem } from "../utils/animations";
 import logo from "../assets/logo/logo.png";
 import { Mail, ArrowLeft } from "lucide-react";
 
@@ -91,30 +92,40 @@ function ForgotPassword() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
-              <Input
-                type="email"
-                placeholder={t("email")}
-                icon={Mail}
-                {...register("email")}
-                error={errors.email?.message}
-              />
+            <motion.form
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-6 mt-4"
+            >
+              <motion.div variants={staggerItem}>
+                <Input
+                  type="email"
+                  placeholder={t("email")}
+                  icon={Mail}
+                  {...register("email")}
+                  error={errors.email?.message}
+                />
+              </motion.div>
 
-              <Button
-                type="submit"
-                className="w-full h-12 text-lg font-bold shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 active:scale-[0.98]"
-                disabled={loading || !isValid}
-              >
-                {loading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    <span>{t("send_code")}...</span>
-                  </div>
-                ) : (
-                  t("send_code")
-                )}
-              </Button>
-            </form>
+              <motion.div variants={staggerItem}>
+                <Button
+                  type="submit"
+                  className="w-full h-12 text-lg font-bold shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 active:scale-[0.98]"
+                  disabled={loading || !isValid}
+                >
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      <span>{t("send_code")}...</span>
+                    </div>
+                  ) : (
+                    t("send_code")
+                  )}
+                </Button>
+              </motion.div>
+            </motion.form>
           </CardContent>
 
           <CardFooter className="flex flex-col gap-4 pt-0">

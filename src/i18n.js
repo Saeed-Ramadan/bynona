@@ -114,6 +114,11 @@ i18n
             password_match: "كلمات المرور غير متطابقة",
             phone_invalid: "رقم الهاتف غير صحيح",
           },
+          // for 404 page
+          not_found_title: "الصفحة غير موجودة",
+          not_found_description:
+            "عذراً، الرابط الذي حاولت الوصول إليه غير موجود. تحقق من الرابط أو عد للصفحة الرئيسية",
+          back_to_home: "العودة للصفحة الرئيسية",
         },
       },
       en: {
@@ -227,6 +232,11 @@ i18n
             password_match: "Passwords do not match",
             phone_invalid: "Invalid phone number",
           },
+          // for 404 page
+          not_found_title: "Page Not Found",
+          not_found_description:
+            "Sorry, the link you tried to access does not exist. Check the link or return to the homepage",
+          back_to_home: "Back to Homepage",
         },
       },
     },

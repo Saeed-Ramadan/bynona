@@ -5,6 +5,12 @@ import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import {
+  staggerContainer,
+  staggerItem,
+  fadeInUp,
+  viewportSettings,
+} from "../utils/animations";
 
 function Home() {
   const { t, i18n } = useTranslation();
@@ -130,7 +136,12 @@ function Home() {
 
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-20 mt-16">
         {/* Commercial Brands Section */}
-        <section>
+        <motion.section
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportSettings}
+        >
           <SectionHeader
             title={t("commercial_brands_title")}
             subtitle={t("commercial_brands_sub")}
@@ -159,6 +170,7 @@ function Home() {
               {brands.map((brand) => (
                 <motion.div
                   key={brand.id}
+                  variants={staggerItem}
                   whileHover={{ y: -10, scale: 1.02 }}
                   onClick={() => handleBrandClick(brand.id)}
                   className="min-w-[180px] sm:min-w-[220px] snap-start flex items-center justify-center p-6 bg-card border border-border rounded-xl cursor-pointer hover:shadow-xl transition-all shadow-sm"
@@ -172,10 +184,15 @@ function Home() {
               ))}
             </div>
           )}
-        </section>
+        </motion.section>
 
         {/* Categories Section */}
-        <section>
+        <motion.section
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportSettings}
+        >
           <SectionHeader
             title={t("shop_by_category_title")}
             subtitle={t("shop_by_category_sub")}
@@ -204,6 +221,7 @@ function Home() {
               {categories.map((category) => (
                 <motion.div
                   key={category.id}
+                  variants={staggerItem}
                   whileHover={{ scale: 1.08, y: -5 }}
                   onClick={() => handleCategoryClick(category.id)}
                   className="group flex flex-col items-center gap-4 cursor-pointer min-w-[150px] sm:min-w-[180px] snap-start"
@@ -222,7 +240,7 @@ function Home() {
               ))}
             </div>
           )}
-        </section>
+        </motion.section>
       </div>
     </div>
   );

@@ -20,7 +20,9 @@ import {
 import { useThemeStore } from "../store/useThemeStore";
 import { usePriceModeStore } from "../store/usePriceModeStore";
 
+import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
+import { staggerContainer, staggerItem } from "../utils/animations";
 import mainLogo from "../assets/logo/logo.png";
 import Button from "./ui/Button";
 import { logoutUser } from "../lib/axios";
@@ -134,46 +136,72 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 w-full shadow-sm bg-background border-b border-border z-50 transition-colors duration-300">
       {/* Main Header */}
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4"
+      >
         {/* Logo */}
-        <Link to="/" className="shrink-0">
-          <img
-            src={mainLogo}
-            alt="Bynona Logo"
-            className="w-22.5 h-6.5 object-contain dark:invert"
-          />
-        </Link>
+        <motion.div variants={staggerItem} className="shrink-0">
+          <Link to="/">
+            <img
+              src={mainLogo}
+              alt="Bynona Logo"
+              className="w-22.5 h-6.5 object-contain dark:invert"
+            />
+          </Link>
+        </motion.div>
 
         {/* Search Bar */}
-        {!isAuthPage && <Search className="hidden md:block grow max-w-xl" />}
+        {!isAuthPage && (
+          <motion.div
+            variants={staggerItem}
+            className="grow max-w-xl hidden md:block"
+          >
+            <Search />
+          </motion.div>
+        )}
 
         <div className="flex items-center gap-1 sm:gap-2">
           {/* Location Info (Desktop) */}
           {!isAuthPage && (
-            <div className="hidden lg:flex items-center gap-1 cursor-pointer px-2 py-1 rounded-lg hover:bg-secondary transition-colors text-foreground">
+            <motion.div
+              variants={staggerItem}
+              className="hidden lg:flex items-center gap-1 cursor-pointer px-2 py-1 rounded-lg hover:bg-secondary transition-colors text-foreground"
+            >
               <MapPin className="w-4 h-4 text-muted-foreground" />
               <div className="flex flex-col text-[10px] leading-tight">
                 <span className="text-muted-foreground">{t("deliver_to")}</span>
                 <span className="font-bold">{t("egypt")}</span>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {!isAuthPage && (
-            <div className="hidden lg:block h-6 w-px bg-border mx-1" />
+            <motion.div
+              variants={staggerItem}
+              className="hidden lg:block h-6 w-px bg-border mx-1"
+            />
           )}
 
           {!isAuthPage && (
-            <div className="hidden sm:block">
+            <motion.div variants={staggerItem} className="hidden sm:block">
               <PriceModeToggle />
-            </div>
+            </motion.div>
           )}
 
           {/* Settings & User Dropdown */}
-          <div className="relative" ref={dropdownRef}>
-            <button
+          <motion.div
+            variants={staggerItem}
+            className="relative"
+            ref={dropdownRef}
+          >
+            <motion.button
+              whileHover={{ scale: 1.02, backgroundColor: "rgba(0,0,0,0.05)" }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-secondary transition-colors font-bold text-sm outline-none cursor-pointer"
+              className="flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors font-bold text-sm outline-none cursor-pointer"
             >
               {user ? (
                 <div className="flex items-center gap-2">
@@ -191,116 +219,142 @@ const Navbar = () => {
               ) : isAuthPage ? (
                 <Settings className="w-5 h-5 text-muted-foreground" />
               ) : (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 text-foreground">
                   <User className="w-5 h-5" />
                   <span className="hidden sm:inline">{t("login")}</span>
                 </div>
               )}
-              <ChevronDown
-                className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
-              />
-            </button>
+              <motion.div
+                animate={{ rotate: isDropdownOpen ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              </motion.div>
+            </motion.button>
 
             {/* Dropdown Menu */}
-            {isDropdownOpen && (
-              <div className="absolute top-full mt-2 right-0 rtl:left-0 rtl:right-auto w-56 bg-background text-foreground border border-border rounded-xl shadow-2xl z-[1000] py-2 animate-in fade-in slide-in-from-top-2 duration-200">
-                {/* Profile Link */}
-                {user && (
-                  <>
-                    <Link
-                      to="/profile"
-                      onClick={() => setIsDropdownOpen(false)}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary transition-colors text-sm font-medium"
-                    >
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      <span>{t("profile", "My Profile")}</span>
-                    </Link>
-                    <div className="my-1 border-t border-border" />
-                  </>
-                )}
-
-                {/* Theme Toggle Item */}
-                <button
-                  onClick={toggleTheme}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary transition-colors text-sm"
+            <AnimatePresence>
+              {isDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="absolute top-full mt-2 right-0 rtl:left-0 rtl:right-auto w-56 bg-background text-foreground border border-border rounded-xl shadow-2xl z-[1000] py-2"
                 >
-                  {theme === "light" ? (
+                  {/* Profile Link */}
+                  {user && (
                     <>
-                      <Moon className="w-4 h-4 text-muted-foreground" />
-                      <span>{t("dark_mode")}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sun className="w-4 h-4 text-yellow-500" />
-                      <span>{t("light_mode")}</span>
+                      <Link
+                        to="/profile"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary transition-colors text-sm font-medium"
+                      >
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <span>{t("profile", "My Profile")}</span>
+                      </Link>
+                      <div className="my-1 border-t border-border" />
                     </>
                   )}
-                </button>
 
-                {/* Language Toggle Item */}
-                <button
-                  onClick={toggleLanguage}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary transition-colors text-sm"
-                >
-                  <Languages className="w-4 h-4 text-muted-foreground" />
-                  <span>{i18n.language === "ar" ? "English" : "العربية"}</span>
-                </button>
-
-                <div className="px-4 py-2 sm:hidden">
-                  <PriceModeToggle />
-                </div>
-
-                <div className="my-1 border-t border-border" />
-
-                {/* Auth Related Item */}
-                {user ? (
+                  {/* Theme Toggle Item */}
                   <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 dark:hover:bg-red-900/10 text-red-500 transition-colors text-sm font-bold"
+                    onClick={toggleTheme}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary transition-colors text-sm"
                   >
-                    <LogOut className="w-4 h-4" />
-                    <span>{t("logout")}</span>
+                    {theme === "light" ? (
+                      <>
+                        <Moon className="w-4 h-4 text-muted-foreground" />
+                        <span>{t("dark_mode")}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sun className="w-4 h-4 text-yellow-500" />
+                        <span>{t("light_mode")}</span>
+                      </>
+                    )}
                   </button>
-                ) : (
-                  !isAuthPage && (
-                    <Link
-                      to="/login"
-                      onClick={() => setIsDropdownOpen(false)}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary transition-colors text-sm font-bold text-primary"
+
+                  {/* Language Toggle Item */}
+                  <button
+                    onClick={toggleLanguage}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary transition-colors text-sm"
+                  >
+                    <Languages className="w-4 h-4 text-muted-foreground" />
+                    <span>
+                      {i18n.language === "ar" ? "English" : "العربية"}
+                    </span>
+                  </button>
+
+                  <div className="px-4 py-2 sm:hidden">
+                    <PriceModeToggle />
+                  </div>
+
+                  <div className="my-1 border-t border-border" />
+
+                  {/* Auth Related Item */}
+                  {user ? (
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 dark:hover:bg-red-900/10 text-red-500 transition-colors text-sm font-bold"
                     >
-                      <User className="w-4 h-4" />
-                      <span>{t("login")}</span>
-                    </Link>
-                  )
-                )}
-              </div>
-            )}
-          </div>
+                      <LogOut className="w-4 h-4" />
+                      <span>{t("logout")}</span>
+                    </button>
+                  ) : (
+                    !isAuthPage && (
+                      <Link
+                        to="/login"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary transition-colors text-sm font-bold text-primary"
+                      >
+                        <User className="w-4 h-4" />
+                        <span>{t("login")}</span>
+                      </Link>
+                    )
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
           {/* Wishlist & Cart */}
           {!isAuthPage && (
-            <div className="flex items-center gap-0.5 sm:gap-1">
+            <motion.div
+              variants={staggerItem}
+              className="flex items-center gap-0.5 sm:gap-1"
+            >
               <Link to="/favorites">
-                <Button variant="ghost" size="icon" className="w-9 h-9">
-                  <Heart className="w-5 h-5 hover:text-red-500 transition-colors" />
-                </Button>
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Button variant="ghost" size="icon" className="w-9 h-9">
+                    <Heart className="w-5 h-5 hover:text-red-500 transition-colors" />
+                  </Button>
+                </motion.div>
               </Link>
               <Link to="/cart">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative w-9 h-9"
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                 >
-                  <ShoppingCart className="w-5 h-5" />
-                  <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border border-background">
-                    0
-                  </span>
-                </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative w-9 h-9"
+                  >
+                    <ShoppingCart className="w-5 h-5" />
+                    <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border border-background">
+                      0
+                    </span>
+                  </Button>
+                </motion.div>
               </Link>
-            </div>
+            </motion.div>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Mobile Search Row (visible on < md) */}
       {!isAuthPage && (
@@ -315,49 +369,62 @@ const Navbar = () => {
           <div className="max-w-7xl mx-auto px-4">
             {/* Mobile Dropdown View */}
             <div className="md:hidden py-3" ref={categoriesRef}>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
                 onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
-                className="w-full flex items-center justify-between px-4 py-2.5 bg-white/10 rounded-lg text-primary-foreground font-bold transition-all hover:bg-white/20 active:scale-[0.98]"
+                className="w-full flex items-center justify-between px-4 py-2.5 bg-white/10 rounded-lg text-primary-foreground font-bold transition-all hover:bg-white/20"
               >
                 <div className="flex items-center gap-3">
                   <Grid className="w-5 h-5" />
                   <span>{t("all_categories")}</span>
                 </div>
-                <ChevronDown
-                  className={`w-5 h-5 transition-transform duration-300 ${isCategoriesOpen ? "rotate-180" : ""}`}
-                />
-              </button>
+                <motion.div
+                  animate={{ rotate: isCategoriesOpen ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ChevronDown className="w-5 h-5" />
+                </motion.div>
+              </motion.button>
 
               {/* Mobile Categories Menu */}
-              {isCategoriesOpen && (
-                <div className="absolute left-4 right-4 top-full mt-2 bg-background border border-border rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="grid grid-cols-1 divide-y divide-border max-h-[60vh] overflow-y-auto no-scrollbar">
-                    {categories.map((cat) => (
-                      <Link
-                        key={cat.id}
-                        to={`/category/${cat.id}`}
-                        onClick={() => setIsCategoriesOpen(false)}
-                        className="flex items-center gap-4 px-5 py-4 hover:bg-secondary transition-colors group"
-                      >
-                        {cat.image_path ? (
-                          <img
-                            src={cat.image_path}
-                            alt=""
-                            className="w-10 h-10 object-contain rounded-lg bg-secondary group-hover:scale-110 transition-transform"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
-                            <Grid className="w-5 h-5 text-muted-foreground" />
-                          </div>
-                        )}
-                        <span className="font-bold text-foreground">
-                          {cat.name}
-                        </span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <AnimatePresence>
+                {isCategoriesOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute left-4 right-4 top-full mt-2 bg-background border border-border rounded-xl shadow-2xl z-50 overflow-hidden"
+                  >
+                    <div className="grid grid-cols-1 divide-y divide-border max-h-[60vh] overflow-y-auto no-scrollbar">
+                      {categories.map((cat) => (
+                        <Link
+                          key={cat.id}
+                          to={`/category/${cat.id}`}
+                          onClick={() => setIsCategoriesOpen(false)}
+                          className="flex items-center gap-4 px-5 py-4 hover:bg-secondary transition-colors group"
+                        >
+                          {cat.image_path ? (
+                            <img
+                              src={cat.image_path}
+                              alt=""
+                              className="w-10 h-10 object-contain rounded-lg bg-secondary group-hover:scale-110 transition-transform"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
+                              <Grid className="w-5 h-5 text-muted-foreground" />
+                            </div>
+                          )}
+                          <span className="font-bold text-foreground">
+                            {cat.name}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Desktop Horizontal View */}
