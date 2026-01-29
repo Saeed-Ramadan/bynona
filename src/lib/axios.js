@@ -1,6 +1,7 @@
 import axios from "axios";
 import i18n from "../i18n";
 import { toast } from "./toast";
+import { usePriceModeStore } from "../store/usePriceModeStore";
 
 const API_URL = "https://bynona.store/api/v1";
 
@@ -15,13 +16,24 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-    const { priceMode } = JSON.parse(
-      localStorage.getItem("price-mode-storage") ||
-        '{"state":{"priceMode":"retail"}}',
-    ).state;
+
+    // Get price mode directly from storage to ensure we have the absolute latest value
+    let priceMode = "retail";
+    try {
+      const storage = localStorage.getItem("price-mode-storage");
+      if (storage) {
+        const parsed = JSON.parse(storage);
+        priceMode = parsed.state?.priceMode || "retail";
+      }
+    } catch (e) {
+      console.error("Error reading price mode from storage:", e);
+    }
+
+    // Ensure value is strictly 'retail' or 'wholesale'
+    const finalPriceMode = priceMode === "wholesale" ? "wholesale" : "retail";
 
     config.headers["Accept-Language"] = i18n.language || "ar";
-    config.headers["Price-Mode"] = priceMode || "retail";
+    config.headers["Price-Mode"] = finalPriceMode;
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

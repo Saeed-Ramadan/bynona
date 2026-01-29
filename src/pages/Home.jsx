@@ -161,7 +161,7 @@ function Home() {
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="min-w-[200px] h-24 bg-secondary/50 rounded-xl animate-pulse"
+                  className="min-w-50 h-24 bg-secondary/50 rounded-xl animate-pulse"
                 />
               ))}
             </div>

@@ -1,5 +1,9 @@
+import { useEffect, Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "./components/ui/Toast";
+import { useTranslation } from "react-i18next";
+import { usePriceModeStore } from "./store/usePriceModeStore";
+import axiosInstance from "./lib/axios";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -15,10 +19,19 @@ import Checkout from "./pages/Checkout";
 import Profile from "./pages/Profile";
 import Orders from "./pages/Orders";
 import Favorites from "./pages/Favorites";
+import Offers from "./pages/Offers";
 import NotFound from "./pages/NotFound";
 import MainLayout from "./components/layout/MainLayout";
-
 function App() {
+  const { priceMode } = usePriceModeStore();
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    // Sync headers globally whenever mode or language changes
+    axiosInstance.defaults.headers.common["Price-Mode"] = priceMode;
+    axiosInstance.defaults.headers.common["Accept-Language"] = i18n.language;
+  }, [priceMode, i18n.language]);
+
   return (
     <Router>
       <Toaster />
@@ -34,6 +47,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/products" element={<Products />} />
           <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/offers" element={<Offers />} />
           <Route path="/cart" element={<Cart />} />
 
           {/* ways that want to protect */}

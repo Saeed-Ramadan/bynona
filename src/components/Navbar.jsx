@@ -85,16 +85,16 @@ const Navbar = () => {
 
   // Sync user state on route changes
   useEffect(() => {
+    // Only update if value actually changed
     const storedUser = localStorage.getItem("user");
     const parsedUser = storedUser ? JSON.parse(storedUser) : null;
 
-    // Compare stringified versions to avoid unnecessary updates/infinite loops
     if (JSON.stringify(user) !== JSON.stringify(parsedUser)) {
       setUser(parsedUser);
     }
 
     setIsDropdownOpen(false);
-  }, [location.pathname, user]);
+  }, [location.pathname]); // Removed 'user' to break circularity
 
   // Sync document direction and language
   useEffect(() => {
