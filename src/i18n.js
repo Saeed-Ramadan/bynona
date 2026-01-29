@@ -70,6 +70,11 @@ i18n
           shop_by_category_title: "تسوق حسب الفئات",
           shop_by_category_sub: "تسوق بسهولة من خلال اختيار الفئة المناسبة لك",
           view_more: "عرض المزيد",
+          featured_products_title: "منتجات مميزة",
+          featured_products_sub: "منتجات مميزة بجودة عالية وسعر مناسب",
+          add_to_cart: "إضافة إلى العربة",
+          currency: "جنية مصري",
+          off: "خصم",
           // for login page
           welcome_back: "مرحباً بعودتك إلى Bynona",
           email: "البريد الإلكتروني",
@@ -188,6 +193,12 @@ i18n
           shop_by_category_sub:
             "Shop easily by choosing the category that suits you",
           view_more: "View More",
+          featured_products_title: "Featured Products",
+          featured_products_sub:
+            "Premium products with high quality and affordable prices",
+          add_to_cart: "Add to Cart",
+          currency: "EGP",
+          off: "OFF",
           // for login page
           welcome_back: "Welcome back to Bynona",
           email: "Email Address",

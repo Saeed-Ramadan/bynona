@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import Hero from "../components/home/Hero";
+import FeaturedProducts from "../components/home/FeaturedProducts";
 import axiosInstance from "../lib/axios";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { usePriceModeStore } from "../store/usePriceModeStore";
 import {
   staggerContainer,
   staggerItem,
@@ -15,6 +17,8 @@ import {
 function Home() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { priceMode } = usePriceModeStore();
+
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,7 +35,7 @@ function Home() {
         ]);
 
         if (brandsRes.data.status) {
-          setBrands(brandsRes.data.data);
+          setBrands(brandsRes.data.status ? brandsRes.data.data : []);
         }
         if (categoriesRes.data.success) {
           setCategories(categoriesRes.data.data);
@@ -43,7 +47,7 @@ function Home() {
       }
     };
     fetchData();
-  }, [i18n.language]);
+  }, [i18n.language, priceMode]);
 
   // Auto-scroll logic
   useEffect(() => {
@@ -241,6 +245,9 @@ function Home() {
             </div>
           )}
         </motion.section>
+
+        {/* Featured Products Section */}
+        <FeaturedProducts />
       </div>
     </div>
   );
